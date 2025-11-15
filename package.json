@@ -11,7 +11,7 @@
     "db:migrate": "tsx lib/db/migrate.ts",
     "db:drop": "drizzle-kit drop",
     "db:pull": "drizzle-kit introspect",
-    "db:push": "drizzle-kit up:pg",
+    "db:push": "drizzle-kit up",
     "db:studio": "pnpm exec drizzle-kit studio",
     "db:check": "drizzle-kit check"
   },

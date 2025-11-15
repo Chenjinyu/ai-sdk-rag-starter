@@ -6,3 +6,9 @@ CREATE TABLE IF NOT EXISTS "resources" (
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS "embeddings" (
+	"id" SERIAL PRIMARY KEY NOT NULL,
+	"resource_id" varchar(191) REFERENCES "resources"("id") ON DELETE CASCADE,
+	"embedding" vector(1536) NOT NULL
+);

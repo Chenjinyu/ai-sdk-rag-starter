@@ -13,10 +13,10 @@ export const resources = pgTable("resources", {
 
   createdAt: timestamp("created_at")
     .notNull()
-    .default(sql`now()`),
+    .defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
-    .default(sql`now()`),
+    .defaultNow(),
 });
 
 // Schema for resources - used to validate API requests
