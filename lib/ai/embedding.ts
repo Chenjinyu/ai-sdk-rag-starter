@@ -35,15 +35,28 @@ export const generateEmbedding = async (value: string): Promise<number[]> => {
 
 export const findRelevantContent = async (userQuery: string) => {
   const userQueryEmbedded = await generateEmbedding(userQuery);
-  const similarity = sql<number>`1 - (${cosineDistance(
+  const getCosineDistance = cosineDistance(
     embeddings.embedding,
     userQueryEmbedded,
-  )})`;
+  )
+  console.log('🛑🛑🛑🛑🛑[DEBUG][findRelevantContent] getCosineDistance:', { getCosineDistance })
+  
+  const similarity = sql<number>`1 - (${getCosineDistance})`;
+  console.log('[DEBUG][findRelevantContent] get the similarity from DB:', {similarity})
   const similarGuides = await db
     .select({ name: embeddings.content, similarity })
     .from(embeddings)
     .where(gt(similarity, 0.5))
     .orderBy(t => desc(t.similarity))
     .limit(4);
-  return similarGuides;
+
+  // LOG THE RESULT of the db.select() query
+  console.log("Found relevant content (similarGuides):", similarGuides);
+  const simailarJointStr = simailarContent(similarGuides);
+  console.log("---->>>Found relevant content (simailarJointStr):", simailarJointStr);
+  return simailarJointStr;
 };
+
+const simailarContent = (similarGuides: Array<{ name: string; similarity: number }>) => {
+  return similarGuides.map(g => g.name).join('\n');
+}

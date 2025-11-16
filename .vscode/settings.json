@@ -1,0 +1,15 @@
+{
+  // Use 2 spaces for indentation
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+
+  // Apply to TS specifically (optional)
+  "[typescript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[typescriptreact]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  }
+}
