@@ -1,5 +1,6 @@
 import { createResource } from '@/lib/actions/resources';
 import { openai } from '@ai-sdk/openai';
+import { deepinfra } from '@ai-sdk/deepinfra';
 import {
   convertToModelMessages,
   streamText,
@@ -13,6 +14,9 @@ import { findRelevantContent } from '@/lib/ai/embedding';
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
+
+const OPENAI_MODEL = openai('gpt-4o');
+const LLAMA_MODEL = deepinfra('');
 /**
 the sequence flow with tools is:
 messages → OpenAI model → model decides → returns tool call → SDK runs tool.execute()
@@ -54,11 +58,18 @@ Model receives tool result and continues generating the final answer
 
  */
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
-  // 🛑 LOG: see the full list of messages being send to the model
+  const { messages, data }: { messages: UIMessage[] , data?: any} = await req.json();
   console.log('Incoming messages:', JSON.stringify(messages, null, 2));  
   const lastMessage = messages[messages.length - 1];
-  console.log('Last message parts:', lastMessage?.parts)
+  console.log('Last message parts:', lastMessage)
+  // const modelSelectionPart = lastMessage.parts.find(
+  //   part => part.type === 'model-selection'
+  // );
+  // const selectedModel = modelSelectionPart?.metadata?.model || 'gpt-4o';
+
+  // Destructure your custom data property
+  const { selectedModelName } = data as { selectedModelName?: string };
+  console.log('[DEBUG] Selected model from message metadata:', selectedModelName);
   const result = streamText({
     model: openai('gpt-4o'),
     messages: convertToModelMessages(messages),
@@ -76,9 +87,9 @@ export async function POST(req: Request) {
             .describe('the content or resource to add to the knowledge base'),
         }),
         execute: async ({ content }) => { 
-          console.log('[DEBUG][TOOL CALLED] addResource with content:', { content });
+          console.log('[DEBUG]route.ts.POST.tool.addResource with content:', { content });
           const reps = await createResource({ content })
-          console.log('🛑[DEBUG][TOOL RESULT]🛑 addResource result:', { reps });
+          console.log('[DEBUG]route.ts.POST.tool.addResource result:', { reps });
         },
       }),
       getInformation: tool({
@@ -87,9 +98,9 @@ export async function POST(req: Request) {
           question: z.string().describe('the users question'),
         }),
         execute: async ({ question }) => {
-          console.log('[DEBUG][TOOL CALLED] getInformation with content:', { question });
+          console.log('[DEBUG]route.ts.POST.tool.getInformation with content:', { question });
           const result = await findRelevantContent(question);
-          console.log('[DEBUG][TOOL RESULT] getInformation returns:', result);
+          console.log('[DEBUG]route.ts.POST.tool.getInformation returns:', result);
           return result;
         }
       }),

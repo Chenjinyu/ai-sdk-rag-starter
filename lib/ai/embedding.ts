@@ -39,7 +39,7 @@ export const findRelevantContent = async (userQuery: string) => {
     embeddings.embedding,
     userQueryEmbedded,
   )
-  console.log('🛑🛑🛑🛑🛑[DEBUG][findRelevantContent] getCosineDistance:', { getCosineDistance })
+  console.log('[DEBUG][findRelevantContent] getCosineDistance:', { getCosineDistance })
   
   const similarity = sql<number>`1 - (${getCosineDistance})`;
   console.log('[DEBUG][findRelevantContent] get the similarity from DB:', {similarity})
@@ -51,9 +51,9 @@ export const findRelevantContent = async (userQuery: string) => {
     .limit(4);
 
   // LOG THE RESULT of the db.select() query
-  console.log("Found relevant content (similarGuides):", similarGuides);
+  console.log("[DEBUG] ai.embedding.ts. findRelevantContent (similarGuides):", similarGuides);
   const simailarJointStr = simailarContent(similarGuides);
-  console.log("---->>>Found relevant content (simailarJointStr):", simailarJointStr);
+  console.log("[DEBUG]] ai.embedding.ts. findRelevantContent (simailarJointStr):", simailarJointStr);
   return simailarJointStr;
 };
 
