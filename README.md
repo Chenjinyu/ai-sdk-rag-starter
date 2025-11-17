@@ -12,3 +12,30 @@ This project will use the following stack:
 - [Drizzle ORM](https://orm.drizzle.team)
 - [Postgres](https://www.postgresql.org/) with [ pgvector ](https://github.com/pgvector/pgvector)
 - [shadcn-ui](https://ui.shadcn.com) and [TailwindCSS](https://tailwindcss.com) for styling
+
+
+## [ai-sdk-ollama](https://github.com/jagreehal/ai-sdk-ollama)
+the package is part of the Vercel AI SDK provier ecosystem
+A Vercel AI SDK v5+ provider for Ollama built on the official ollama package. Type safe, future proof, with cross provider compatibility and native Ollama features.
+```python
+import { ollama } from "ai-sdk-ollama";
+
+const model = ollama("llama3.2");
+
+const response = await generateText({
+  model,
+  prompt: "Hello",
+});
+
+```
+
+### Features
+- works only inside the Vercel AI SDK workflow
+- Supports AI SDK primitives:
+  - generateText()
+  - streamText()
+  - tool calls
+  - image generation 
+- Built to work with route handlers(`route.ts`) in Next.js
+- Uses the Vercel AI SDK request/response schema. 
+

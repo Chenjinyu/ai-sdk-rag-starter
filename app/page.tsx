@@ -6,18 +6,15 @@ import { useState } from 'react';
 export default function Chat() {
   const [input, setInput] = useState('');
   // llama3 as the default model
-  const [selectModel, setSelectModel] = useState('llama3.1.8b'); 
+  const [selectedModel, setSelectedModel] = useState('llama3.1.8b'); 
   /*
   * useChat({ api: "api/chat"}) // can specify api endpoint if not the default /api/chat
   * messages: array of message objects in the conversation
   * sendMessage: function to send a new message
   */
   const { messages, sendMessage } = useChat({
-    api: '/api/chat',
-    body: {
-      data: {
-        selectedModelName: selectModel,
-      }
+    transport: {
+      api: '/api/chat',
     }
   });
   return (
@@ -28,8 +25,8 @@ export default function Chat() {
         <label className="mr-2 font-bold">Select Model:</label>
         <select
           className="border border-gary-300 rounded p-2"
-          value={selectModel}
-          onChange={(e) => setSelectModel(e.target.value)}
+          value={selectedModel}
+          onChange={(e) => setSelectedModel(e.target.value)}
         >
           <option value="llama3.1">LLaMA 3.1 (Base)</option>
           <option value="llama3.1:8b">LLaMA 3.1 8B</option>
@@ -75,9 +72,10 @@ export default function Chat() {
             text: input,
             // metadata so the backend knows which model to use
             metadata: {
-              type: 'model-selection',
-              model: selectModel,
+             type: 'model-selection',
+             model: selectedModel,
             },
+
           });
           setInput('');
         }}

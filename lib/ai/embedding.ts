@@ -6,6 +6,10 @@ import { embeddings } from '../db/schema/embeddings';
 
 const embeddingModel = openai.embedding('text-embedding-ada-002');
 
+function getEmbeddingModel(selectedModelName: string) { 
+
+}
+
 const generateChunks = (input: string): string[] => {
   return input
     .trim()

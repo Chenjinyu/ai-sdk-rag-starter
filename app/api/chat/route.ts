@@ -1,5 +1,4 @@
 import { createResource } from '@/lib/actions/resources';
-import { openai } from '@ai-sdk/openai';
 import { deepinfra } from '@ai-sdk/deepinfra';
 import {
   convertToModelMessages,
@@ -10,12 +9,12 @@ import {
 } from 'ai';
 import { z } from 'zod';
 import { findRelevantContent } from '@/lib/ai/embedding';
-
+import { selectModel } from '@/lib/utils';
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
 
-const OPENAI_MODEL = openai('gpt-4o');
+
 const LLAMA_MODEL = deepinfra('');
 /**
 the sequence flow with tools is:
@@ -58,7 +57,7 @@ Model receives tool result and continues generating the final answer
 
  */
 export async function POST(req: Request) {
-  const { messages, data }: { messages: UIMessage[] , data?: any} = await req.json();
+  const { messages, metadata }: { messages: UIMessage[] , metadata?: any} = await req.json();
   console.log('Incoming messages:', JSON.stringify(messages, null, 2));  
   const lastMessage = messages[messages.length - 1];
   console.log('Last message parts:', lastMessage)
@@ -68,10 +67,10 @@ export async function POST(req: Request) {
   // const selectedModel = modelSelectionPart?.metadata?.model || 'gpt-4o';
 
   // Destructure your custom data property
-  const { selectedModelName } = data as { selectedModelName?: string };
+  const { selectedModelName } = metadata as { selectedModelName?: string };
   console.log('[DEBUG] Selected model from message metadata:', selectedModelName);
   const result = streamText({
-    model: openai('gpt-4o'),
+    model: selectModel('ollama'),
     messages: convertToModelMessages(messages),
     stopWhen: stepCountIs(5),
     system: `You are a helpful assistant. Check your knowledge base before answering any questions.
