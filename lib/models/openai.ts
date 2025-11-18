@@ -1,3 +1,5 @@
 import { openai } from '@ai-sdk/openai';
 
-export const openAIModel = openai('gpt-4o');
+export function openAIModel(modelName: string) {
+  return openai(modelName);
+} // gpt-4o

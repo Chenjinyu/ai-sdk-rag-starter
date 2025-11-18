@@ -9,13 +9,12 @@ import {
 } from 'ai';
 import { z } from 'zod';
 import { findRelevantContent } from '@/lib/ai/embedding';
+import { ollamaModel } from '@/lib/models/ollama';
 import { selectModel } from '@/lib/utils';
+import { PROMPT_NEW, PROMPT_DEFAULT } from '@/app/config/prompt';
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
-
-
-const LLAMA_MODEL = deepinfra('');
 /**
 the sequence flow with tools is:
 messages → OpenAI model → model decides → returns tool call → SDK runs tool.execute()
@@ -65,17 +64,26 @@ export async function POST(req: Request) {
   //   part => part.type === 'model-selection'
   // );
   // const selectedModel = modelSelectionPart?.metadata?.model || 'gpt-4o';
-
   // Destructure your custom data property
-  const { selectedModelName } = metadata as { selectedModelName?: string };
+  // type MessageWithMetadata = UIMessage & {
+  //   metadata?: {
+  //     selectedModelName?: string;
+  //     [key: string]: any;
+  //   };
+  // };
+
+  const {
+    metadata: {
+      metadataType,
+      selectedModelName,
+    } = {}
+  } = lastMessage;
   console.log('[DEBUG] Selected model from message metadata:', selectedModelName);
   const result = streamText({
-    model: selectModel('ollama'),
+    model: selectModel(selectedModelName),
     messages: convertToModelMessages(messages),
     stopWhen: stepCountIs(5),
-    system: `You are a helpful assistant. Check your knowledge base before answering any questions.
-    Only respond to questions using information from tool calls.
-    if no relevant information is found in the tool calls, respond, "Sorry, I don't know. There is no relevant infomration in my knowledge base."`,
+    system: PROMPT_DEFAULT,
     tools: {
       addResource: tool({
         description: `add a resource to your knowledge base.

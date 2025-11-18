@@ -1,22 +1,19 @@
 'use client';
 
+import { MODEL_CONFIG } from '@/lib/utils';
 import { useChat } from '@ai-sdk/react';
 import { useState } from 'react';
 
 export default function Chat() {
   const [input, setInput] = useState('');
   // llama3 as the default model
-  const [selectedModel, setSelectedModel] = useState('llama3.1.8b'); 
+  const [selectedModel, setSelectedModel] = useState('llama3.1:8b'); 
   /*
   * useChat({ api: "api/chat"}) // can specify api endpoint if not the default /api/chat
   * messages: array of message objects in the conversation
   * sendMessage: function to send a new message
   */
-  const { messages, sendMessage } = useChat({
-    transport: {
-      api: '/api/chat',
-    }
-  });
+  const { messages, sendMessage } = useChat();
   return (
     <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
 
@@ -28,11 +25,14 @@ export default function Chat() {
           value={selectedModel}
           onChange={(e) => setSelectedModel(e.target.value)}
         >
-          <option value="llama3.1">LLaMA 3.1 (Base)</option>
-          <option value="llama3.1:8b">LLaMA 3.1 8B</option>
-          <option value="llama3.1:70b">LLaMA 3.1 70B</option>
-          <option value="gpt-4o">GPT-4o (OpenAI)</option>
-          <option value="qwen2.5">Qwen 2.5</option>
+          { /** Static Options */}
+          { 
+            MODEL_CONFIG.map((cfg) => (
+              <option key={cfg.modelVersion} value={cfg.modelVersion}>
+                {cfg.modelName}
+              </option>
+            ))
+          }
         </select>
       </div>
       { /* --- Chat Message Render --- */}
@@ -72,8 +72,8 @@ export default function Chat() {
             text: input,
             // metadata so the backend knows which model to use
             metadata: {
-             type: 'model-selection',
-             model: selectedModel,
+             metadataType: 'model-selection',
+             selectedModelName: selectedModel,
             },
 
           });
